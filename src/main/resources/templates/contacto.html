@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Formulario de Contacto</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #e0e7ff, #c3dafe);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Arial', sans-serif;
+        }
+        .form-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            transform: translateY(0);
+            animation: slideUp 0.5s ease-out;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .form-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        .form-group i {
+            position: absolute;
+            top: 50%;
+            left: 1rem;
+            transform: translateY(-50%);
+            color: #4b5563;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        button {
+            background: #6366f1;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+            width: 100%;
+        }
+        button:hover {
+            background: #4f46e5;
+            transform: translateY(-2px);
+        }
+        .file-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            background: #f9fafb;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+        .file-input-wrapper:hover {
+            border-color: #6366f1;
+            background: #eef2ff;
+        }
+        .file-input-wrapper i {
+            color: #4b5563;
+            margin-right: 0.5rem;
+        }
+        .file-input-wrapper input[type="file"] {
+            border: none;
+            padding: 0;
+            background: transparent;
+            width: 100%;
+        }
+        .file-input-wrapper input[type="file"]::file-selector-button {
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .file-input-wrapper input[type="file"]::file-selector-button:hover {
+            background: #4f46e5;
+        }
+        .success-message {
+            color: #10b981;
+            font-weight: bold;
+            text-align: center;
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @media (max-width: 640px) {
+            .form-container {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="form-container">
+    <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Formulario de Contacto</h2>
+
+    <form th:action="@{/contacto/enviar}" method="post" enctype="multipart/form-data" th:object="${contacto}" id="contactForm">
+        <div class="form-group">
+            <i class="fas fa-user"></i>
+            <input type="text" th:field="*{nombre}" placeholder="Nombre" required>
+        </div>
+
+        <div class="form-group">
+            <i class="fas fa-envelope"></i>
+            <input type="email" th:field="*{correo}" placeholder="Email" required>
+        </div>
+
+        <div class="form-group">
+            <i class="fas fa-tag"></i>
+            <input type="text" th:field="*{asunto}" placeholder="Asunto" required>
+        </div>
+
+        <div class="form-group">
+            <i class="fas fa-comment"></i>
+            <textarea th:field="*{mensaje}" placeholder="Mensaje" required></textarea>
+        </div>
+
+        <div class="form-group">
+            <div class="file-input-wrapper">
+                <i class="fas fa-paperclip"></i>
+                <input type="file" name="archivo">
+            </div>
+        </div>
+
+        <button type="submit">
+            <i class="fas fa-paper-plane mr-2"></i>Enviar
+        </button>
+    </form>
+
+    <p th:text="${mensaje}" class="success-message mt-4" th:classappend="${mensaje} ? 'success-message' : ''" id="successMessage"></p>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const successMessage = document.getElementById('successMessage').textContent;
+        if (successMessage && successMessage.trim() !== '') {
+            Swal.fire({
+                icon: 'success',
+                title: '¡Mensaje Enviado!',
+                text: successMessage,
+                confirmButtonText: 'Aceptar',
+                confirmButtonColor: '#6366f1',
+                timer: 3000,
+                timerProgressBar: true
+            }).then(() => {
+                // Clear the form after the alert is closed
+                document.getElementById('contactForm').reset();
+            });
+        }
+    });
+</script>
+</body>
+</html>
